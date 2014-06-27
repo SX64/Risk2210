@@ -1,33 +1,5 @@
 #!/usr/bin/env python
 
-#need to figure out QT
-
-#need to copy over what I have with java
-
-#ideas that need to be implemented: //in no particular order
-#space station
-#commanders (is a guy)
-#borders
-#territories
-#guys
-#commander types
-#player
-#turn
-#turn order
-#the moon
-#regions, for lack of the correct term
-#bonuses (technically boni)
-#cards
-#card types
-#energy
-#dice
-#an attack
-#contiguity
-#eight sided dice
-#water vs land vs moon territories
-#territory ownership
-#contiguity
-#
 """
 #OS X 10.9.3
 #using PySide 1.2.1
@@ -44,8 +16,8 @@ from PySide import *
 
 
 #MacBook panel is 1440x900
-width = 1400
-height = 860
+width = 700#1400
+height = 430#860
 gfxOff = 40
 
 
@@ -65,10 +37,19 @@ board.show()
 sys.exit(app.exec_())
 
 """
+
+def food():
+	print "cheese"
+
 class test:
-	def amount():
-		print 'called'
+	value = 7
+	def __init__(self):
+		value = 8
+	def printme(self):
+		print "it finally works"
 		
+
+foo = test()
 
 class boardGUI(QtGui.QWidget):
     
@@ -88,8 +69,11 @@ class boardGUI(QtGui.QWidget):
         
         btn = QtGui.QPushButton('Button\'s spleen', self)
         #btn.setToolTip('This is a <b>QPushButton</b> widget')
-        foo = test()
-        btn.clicked.connect(foo.amount)
+        #foo = test()
+        btn.clicked.connect(food)
+        #btn.clicked.connect(test.printme) #does not work
+        btn.clicked.connect(foo.printme) #does nothing but compiles
+        #btn.clicked.connect(self.absurd)
         btn.resize(btn.sizeHint())
         btn.move(50, 50)
     
@@ -99,17 +83,23 @@ class boardGUI(QtGui.QWidget):
         qbtn.move(150, 150)
     
     
+    	
+    	
         self.setGeometry(gfxOff, gfxOff, width, height)
         self.setWindowTitle('Risk 2210')
         #self.setWindowIcon(QtGui.QIcon('web.png'))        this for title bar
     
         self.show()
         
+        
+    def absurd(self):
+    	sender = self.sender()
+        self.setWindowTitle('stupidity')
+        
 def main():
     app = QtGui.QApplication(sys.argv)
     ex = boardGUI()
     sys.exit(app.exec_())
-
 
 if __name__ == '__main__':
     main()
