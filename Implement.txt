@@ -27,7 +27,7 @@ To be implemented (removed from source file):
 #water vs land vs moon territories
 #territory ownership
 #contiguity
-#
+#fix territory borders and the map
 
 Notes: button connections work, but object to connect to must be setup beforehand 
 
