@@ -63,6 +63,7 @@ class uPlayer:
 		return players[self.currentPlayer].commanders[type]
 
 class territory:
+	currentcolor = 'blue'
 	armies = 0
 	qlabel = 0
 	owner = "none"
@@ -72,8 +73,10 @@ class territory:
 	hasSpaceStation = False
 	
 	def changeLabel(self):
-		self.qlabel.setText("0")#"<font color='red'>0</font>")
-	
+		string = "<font color = %s>%s</font>" % (self.currentcolor,str(self.armies))
+		self.qlabel.setText(string)
+		
+		
 	def __init__(self, inputNumber):
 		if inputNumber < 42:
 			self.type = "land"
@@ -90,7 +93,9 @@ class territory:
 		
 		self.changeLabel()
 	
-	
+	def changeArmies(self,number):
+		self.armies += number
+		self.changeLabel()
 
 
 
@@ -105,13 +110,28 @@ UniversalPlayer = uPlayer() #never make another uPlayer
 def attack():
 	origin = territories[territoryNames.index(attackLists[0].currentItem().text())]
 	destination = territories[territoryNames.index(attackLists[1].currentItem().text())]
-	if origin.owner != UniversalPlayer.getCurrentPlayer():
-		return
-	if origin.owner == destination.owner:
-		return
+	#print "attacking from %s to %s" % (origin.name, destination.name)
+	#if origin.owner != UniversalPlayer.getCurrentPlayer():
+	#	return
+	#if origin.owner == destination.owner:
+	#	return
 	if origin.armies < 2:
 		return
+	aC = 0
+	dC = 0
 	rolls = rollDice()
+	attacks = sorted(rolls[0:3])
+	defends = sorted(rolls[3:])
+	if attacks[2] > defends[1]: #sorted backwards
+		dC -= 1
+	else:
+		aC -= 1
+	if attacks[1] > defends[0]:
+		dC -= 1
+	else:
+		aC -= 1
+	origin.changeArmies(aC)
+	destination.changeArmies(dC)
 
 currentPath = []
 def isContiguous(start, end): #pass in territory objects from territories
@@ -133,6 +153,10 @@ def isContiguous(start, end): #pass in territory objects from territories
 
 
 class boardGUI(QtGui.QWidget): #cannot be QtGui.QMainWindow or button layout fails
+
+	def addArmies(self):
+		for t in territories:
+			t.changeArmies(10)
 
 	def generateTerritories(self):
 		global territories
@@ -247,7 +271,7 @@ class boardGUI(QtGui.QWidget): #cannot be QtGui.QMainWindow or button layout fai
 		
 		self.generateTerritories()
 		
-		
+		self.addArmies()
 		
 		self.setGeometry(gfxOff, gfxOff, width, height)
 		self.setWindowTitle('Risk 2210')
