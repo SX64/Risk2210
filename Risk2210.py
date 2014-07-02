@@ -10,6 +10,8 @@ from PySide import *
 #chmod +x this file, then cd [wherever this is], ./Risk2210.py
 """
 
+colors = ["red", "blue", "green", "brown", "black"]
+
 def rollDice():#attack,defend):
 	a1 = random.randint(1,6)
 	a2 = random.randint(1,6)
@@ -49,7 +51,9 @@ class uPlayer:
 		return colors[currentPlayer]
 	
 	def getCurrentPlayer(self): #self needed for button hooked methods of an object
+		print players[self.currentPlayer].name
 		return players[self.currentPlayer].name
+		
 		
 	def changePlayer(self):
 		self.currentPlayer += 1
@@ -96,6 +100,11 @@ class territory:
 	def changeArmies(self,number):
 		self.armies += number
 		self.changeLabel()
+	
+	def changeOwner(self,new):
+		self.owner = new.name
+		self.currentcolor = colors[players.index(new)]
+		self.changeLabel()
 
 
 
@@ -111,10 +120,10 @@ def attack():
 	origin = territories[territoryNames.index(attackLists[0].currentItem().text())]
 	destination = territories[territoryNames.index(attackLists[1].currentItem().text())]
 	#print "attacking from %s to %s" % (origin.name, destination.name)
-	#if origin.owner != UniversalPlayer.getCurrentPlayer():
-	#	return
-	#if origin.owner == destination.owner:
-	#	return
+	if origin.owner != UniversalPlayer.getCurrentPlayer():
+		return
+	if origin.owner == destination.owner:
+		return
 	if origin.armies < 2:
 		return
 	aC = 0
@@ -164,7 +173,9 @@ class boardGUI(QtGui.QWidget): #cannot be QtGui.QMainWindow or button layout fai
 			territories.append(territory(i))
 
 	def assignPlayers(self):
-		text,ok = QtGui.QInputDialog.getText(self,'Enter Player Names','Comma Separated:')
+		#text,ok = QtGui.QInputDialog.getText(self,'Enter Player Names','Comma Separated:')
+		ok = True
+		text = "player0,player1,player2"
 		if ok:
 			global players #must declare, otherwise creates new "players" list
 			names = text.replace(" ","").split(',')
@@ -209,7 +220,7 @@ class boardGUI(QtGui.QWidget): #cannot be QtGui.QMainWindow or button layout fai
 		for k in range(25):
 			territoryMarks.addItem(QtGui.QSpacerItem(30,30), k, 0)
 		for a in range(len(territoryPositions)):
-			label = QtGui.QLabel("<font color='red'>0</font>")
+			label = QtGui.QLabel("0")
 			label.setToolTip(territoryNames[a])
 			territoryLabels.append(label)
 			territoryMarks.addWidget(label, territoryPositions[a][0], territoryPositions[a][1]) #number rows, number cols
@@ -246,8 +257,10 @@ class boardGUI(QtGui.QWidget): #cannot be QtGui.QMainWindow or button layout fai
 		
 		quitbtn.clicked.connect(QtCore.QCoreApplication.instance().quit)
 	
+	def assignTerritories(self):
+		for ter in territories:
+			ter.changeOwner(random.choice(players))
 	
-		
 	def mapUnderlay(self):
 		earth = QtGui.QLabel(self)
 		earth.setGeometry(0, 0, 1227, 756)
@@ -272,6 +285,8 @@ class boardGUI(QtGui.QWidget): #cannot be QtGui.QMainWindow or button layout fai
 		self.generateTerritories()
 		
 		self.addArmies()
+		
+		self.assignTerritories()
 		
 		self.setGeometry(gfxOff, gfxOff, width, height)
 		self.setWindowTitle('Risk 2210')
