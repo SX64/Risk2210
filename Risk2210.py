@@ -31,6 +31,15 @@ attackLists = []
 territories = []
 players = []
 
+
+UberBoard = 0
+
+
+
+
+
+
+
 class player:
 	#change all fields to arrays
 	spaceStations = 0
@@ -42,12 +51,22 @@ class player:
 	def __init__(self, inputName):
 		self.name = inputName
 
+
+
+
+
+
+
+
+
+
+
 class uPlayer:
 	#should be singleton, don't know how to do those
 	currentPlayer = 0
-	colors = ["red", "green", "blue", "yellow", "brown"]
+	colors = ["red", "green", "blue", "yellow", "black"]
 	
-	def getCurrentColor():
+	def getCurrentColor(self):
 		return colors[currentPlayer]
 	
 	def getCurrentPlayer(self): #self needed for button hooked methods of an object
@@ -65,6 +84,17 @@ class uPlayer:
 		
 	def hasCommander(type):
 		return players[self.currentPlayer].commanders[type]
+
+
+UniversalPlayer = uPlayer() #never make another uPlayer
+
+
+
+
+
+
+
+
 
 class territory:
 	currentcolor = 'blue'
@@ -106,6 +136,19 @@ class territory:
 		self.currentcolor = colors[players.index(new)]
 		self.changeLabel()
 
+	def hostileTakeover(self, number):
+		owner = UniversalPlayer.getCurrentPlayer()
+		currentcolor = UniversalPlayer.getCurrentColor()
+		self.armies = self.armies + number
+		self.changeLabel()
+
+
+
+
+
+
+
+
 
 
 #MacBook panel is 1440x900
@@ -114,7 +157,14 @@ height = 860
 gfxOff = 40
 
 
-UniversalPlayer = uPlayer() #never make another uPlayer
+
+
+
+
+
+
+
+
 
 def attack():
 	origin = territories[territoryNames.index(attackLists[0].currentItem().text())]
@@ -141,6 +191,25 @@ def attack():
 		aC -= 1
 	origin.changeArmies(aC)
 	destination.changeArmies(dC)
+	if destination.armies <= 0:
+		print "in if"
+		destination.armies = 0
+		text,ok = QtGui.QInputDialog.getText(UberBoard,'Additional Armies','Numeral:')
+		move = int(text) + 1
+		if move >= origin.armies:
+			move = origin.armies - 1
+		origin.changeArmies(move * -1)
+		destination.hostileTakeover(move)
+
+
+
+
+
+
+
+
+
+
 
 currentPath = []
 def isContiguous(start, end): #pass in territory objects from territories
@@ -158,6 +227,14 @@ def isContiguous(start, end): #pass in territory objects from territories
 			return True
 	currentPath.pop()
 	return False
+
+
+
+
+
+
+
+
 
 
 
@@ -269,11 +346,6 @@ class boardGUI(QtGui.QWidget): #cannot be QtGui.QMainWindow or button layout fai
 		
 		
 	def initUI(self):
-	
-		#tooltip stuff
-		#QtGui.QToolTip.setFont(QtGui.QFont('SansSerif', 10))
-		#self.setToolTip('This is a <b>QWidget</b> widget')
-		#btn.setToolTip('This is a <b>QPushButton</b> widget')
 		
 		
 		self.assignPlayers()
@@ -291,7 +363,10 @@ class boardGUI(QtGui.QWidget): #cannot be QtGui.QMainWindow or button layout fai
 		self.setGeometry(gfxOff, gfxOff, width, height)
 		self.setWindowTitle('Risk 2210')
 		#self.setWindowIcon(QtGui.QIcon('web.png'))		this for title bar
-	
+		
+		global UberBoard
+		UberBoard = self
+		
 		self.show()
 
 
